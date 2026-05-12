@@ -1,0 +1,16 @@
+node_modules/
+dist/
+out/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-error.log
+.env
+.env.local
+.vscode/
+.idea/
+*.swp
+*.swo
+coverage/
+.nyc_output/
+.cache/

@@ -1,0 +1,31 @@
+{
+  "name": "capysaver",
+  "version": "0.1.0",
+  "description": "The screensaver that actually stops you.",
+  "main": "src/main.js",
+  "author": "happycapy.ai",
+  "license": "MIT",
+  "private": false,
+  "homepage": "https://happycapy.ai/capysaver",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/REPLACE_ME/capysaver.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

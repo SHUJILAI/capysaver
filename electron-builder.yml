@@ -1,0 +1,49 @@
+appId: ai.happycapy.capysaver
+productName: CapySaver
+copyright: Copyright © 2026 happycapy.ai
+directories:
+  buildResources: assets
+  output: dist
+files:
+  - src/**/*
+  - assets/**/*
+  - package.json
+  - "!**/*.md"
+  - "!**/.git/**"
+asar: true
+
+mac:
+  category: public.app-category.lifestyle
+  icon: assets/sprites/capy_icon.png
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  identity: null
+
+win:
+  icon: assets/sprites/capy_icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+linux:
+  icon: assets/sprites/capy_icon.png
+  category: Utility
+  target:
+    - target: AppImage
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+
+publish:
+  provider: github
+  releaseType: release

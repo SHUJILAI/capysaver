@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>CapySaver Settings</title>
+  <style>
+    :root {
+      --cream: #faf6ee;
+      --forest: #1f2e25;
+      --gold: #d4a017;
+      --muted: #6b7a70;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--cream);
+      color: var(--forest);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    main {
+      padding: 22px 26px;
+    }
+    h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 22px;
+      margin: 0 0 4px 0;
+      color: var(--forest);
+    }
+    p.sub { color: var(--muted); margin: 0 0 18px 0; font-size: 12px; }
+
+    fieldset {
+      border: 1px solid rgba(31, 46, 37, 0.12);
+      border-radius: 10px;
+      padding: 14px 14px 10px 14px;
+      margin-bottom: 14px;
+    }
+    legend { padding: 0 6px; font-weight: 600; color: var(--forest); }
+
+    label.row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+    }
+    label.row input[type="number"],
+    label.row input[type="time"] {
+      padding: 6px 8px;
+      border: 1px solid rgba(31, 46, 37, 0.2);
+      border-radius: 6px;
+      font: inherit;
+      width: 100px;
+      background: #fff;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      font: inherit;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(31, 46, 37, 0.25);
+      background: #fff;
+      cursor: pointer;
+    }
+    button.primary {
+      background: var(--forest);
+      color: var(--cream);
+      border-color: var(--forest);
+    }
+    button.primary:hover { background: #162019; }
+
+    .saved {
+      color: var(--gold);
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 200ms ease;
+      align-self: center;
+    }
+    .saved.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CapySaver</h1>
+    <p class="sub">the screensaver that actually stops you.</p>
+
+    <fieldset>
+      <legend>Nap schedule</legend>
+      <label class="row">
+        <input type="radio" name="mode" value="interval" id="mode-interval" />
+        Every
+        <input type="number" id="interval" min="1" max="480" step="1" />
+        minutes
+      </label>
+      <label class="row">
+        <input type="radio" name="mode" value="time" id="mode-time" />
+        At
+        <input type="time" id="time" />
+        (daily)
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Behavior</legend>
+      <label class="row">
+        <input type="checkbox" id="enabled" />
+        Enable CapySaver
+      </label>
+      <label class="row">
+        <input type="checkbox" id="autolaunch" />
+        Launch at login
+      </label>
+    </fieldset>
+
+    <div class="actions">
+      <span class="saved" id="saved">saved ✓</span>
+      <button id="cancel">Close</button>
+      <button class="primary" id="save">Save</button>
+    </div>
+  </main>
+  <script src="./settings.js"></script>
+</body>
+</html>
