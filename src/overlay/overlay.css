@@ -18,15 +18,26 @@ html, body {
   cursor: url('../../assets/sprites/paw_cursor.png') 8 8, default;
 }
 
+/* ===== Backdrop ===== */
 #backdrop {
   position: fixed;
   inset: 0;
   background: radial-gradient(ellipse at center, rgba(31, 46, 37, 0.82) 0%, rgba(10, 16, 12, 0.94) 100%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: fadeIn 500ms ease-out both;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
+  animation: backdropIn 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
 
+#backdrop.exit-flash {
+  animation: backdropFlash 520ms ease-in forwards;
+}
+
+#backdrop.exit-soft {
+  animation: backdropSoft 700ms ease-out forwards;
+}
+
+/* ===== Stage ===== */
 #stage {
   position: fixed;
   inset: 0;
@@ -37,29 +48,101 @@ html, body {
   gap: 18px;
 }
 
+#stage.exit-curl,
+#stage.exit-leap {
+  pointer-events: none;
+}
+
+/* ===== Capy ===== */
 #capy {
   width: 360px;
   height: 360px;
   object-fit: contain;
   image-rendering: -webkit-optimize-contrast;
-  transform: translateY(-120vh);
-  animation: slideDown 900ms cubic-bezier(0.22, 1.2, 0.36, 1) forwards;
+  transform-origin: 50% 100%;
+  transform: translateY(-130vh) rotate(-8deg);
   filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.45));
+  animation:
+    capyDrop 950ms cubic-bezier(0.34, 1.36, 0.64, 1) forwards,
+    capyBreathe 4.2s 1100ms ease-in-out infinite;
 }
 
 #capy.shake {
-  animation: shake 700ms ease-in-out;
+  /* shake is a transient overlay on the breathing loop */
+  animation: capyShake 700ms ease-in-out, capyBreathe 4.2s ease-in-out infinite;
 }
 
+/* Exit: hop, then leap off toward the top-right with rotation */
+#capy.exit-leap {
+  animation: capyHop 240ms ease-out, capyLeap 720ms 240ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+/* Exit (snooze): curl smaller and slide off bottom */
+#capy.exit-curl {
+  animation: capyCurl 720ms cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+}
+
+/* ===== Speed lines (motion streaks behind dropping capy) ===== */
+#speedlines {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 360px;
+  height: 60vh;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  animation: streakIn 700ms ease-out forwards, streakOut 360ms 700ms ease-in forwards;
+}
+
+.streak {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 80px;
+  background: linear-gradient(to bottom, rgba(250, 246, 238, 0) 0%, rgba(250, 246, 238, 0.55) 60%, rgba(250, 246, 238, 0) 100%);
+  border-radius: 2px;
+  transform: translateY(-100px);
+  animation: streakFall 760ms ease-in forwards;
+}
+.streak.s1 { left: 18%;  animation-delay:   0ms; height: 70px; }
+.streak.s2 { left: 32%;  animation-delay:  80ms; height: 110px; }
+.streak.s3 { left: 50%;  animation-delay:  40ms; height: 90px; opacity: 0.8; }
+.streak.s4 { left: 68%;  animation-delay: 120ms; height: 130px; }
+.streak.s5 { left: 82%;  animation-delay:  20ms; height: 80px; }
+
+/* Exit dust puff after the leap */
+#dust {
+  position: fixed;
+  left: 50%;
+  bottom: calc(50% - 200px);
+  width: 220px;
+  height: 60px;
+  margin-left: -110px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(250, 246, 238, 0.35) 0%, rgba(250, 246, 238, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+#dust.go { animation: dustPuff 720ms ease-out forwards; }
+
+/* ===== Tagline ===== */
 #tagline {
   font-family: "Fraunces", "Iowan Old Style", Georgia, serif;
   font-size: 34px;
   letter-spacing: 0.5px;
   margin: 4px 0 14px 0;
   opacity: 0;
-  animation: fadeIn 600ms 700ms ease-out forwards;
+  transform: translateY(18px);
+  animation: textIn 600ms 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+#stage.exit-leap #tagline,
+#stage.exit-curl #tagline {
+  animation: textOut 360ms ease-in forwards;
+}
+
+/* ===== Buttons ===== */
 #dismiss {
   background: transparent;
   color: var(--cream);
@@ -68,8 +151,9 @@ html, body {
   padding: 8px 16px;
   cursor: url('../../assets/sprites/paw_cursor.png') 8 8, pointer;
   opacity: 0;
-  transition: all 220ms ease;
-  animation: fadeIn 500ms 1100ms ease-out forwards;
+  transform: translateY(12px);
+  transition: font-size 220ms ease, padding 220ms ease, color 220ms ease, border-color 220ms ease;
+  animation: textIn 500ms 1350ms ease-out forwards;
   font-family: inherit;
 }
 
@@ -89,10 +173,19 @@ html, body {
   text-decoration: underline;
   cursor: url('../../assets/sprites/paw_cursor.png') 8 8, pointer;
   opacity: 0;
-  animation: fadeIn 500ms 1400ms ease-out forwards;
+  transform: translateY(12px);
+  animation: textIn 500ms 1550ms ease-out forwards;
   font-family: inherit;
 }
 
+#stage.exit-leap #dismiss,
+#stage.exit-leap #snooze,
+#stage.exit-curl #dismiss,
+#stage.exit-curl #snooze {
+  animation: textOut 280ms ease-in forwards;
+}
+
+/* ===== Z z z floats ===== */
 #zzz {
   position: absolute;
   top: 18%;
@@ -110,31 +203,135 @@ html, body {
   margin-right: 6px;
 }
 
-.z1 { font-size: 28px; animation: floatZ 3s 0.8s infinite ease-in-out; }
-.z2 { font-size: 38px; animation: floatZ 3s 1.4s infinite ease-in-out; }
-.z3 { font-size: 48px; animation: floatZ 3s 2.0s infinite ease-in-out; }
+.z1 { font-size: 28px; animation: floatZ 3s 1.4s infinite ease-in-out; }
+.z2 { font-size: 38px; animation: floatZ 3s 2.0s infinite ease-in-out; }
+.z3 { font-size: 48px; animation: floatZ 3s 2.6s infinite ease-in-out; }
 
-@keyframes slideDown {
-  0%   { transform: translateY(-120vh) rotate(-4deg); }
-  70%  { transform: translateY(14px) rotate(1deg); }
-  100% { transform: translateY(0) rotate(0deg); }
+#stage.exit-leap #zzz,
+#stage.exit-curl #zzz {
+  animation: zzzBurst 500ms ease-out forwards;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-10px) rotate(-2deg); }
-  40% { transform: translateX(10px) rotate(2deg); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
+/* ===== Keyframes — Entrance ===== */
+@keyframes backdropIn {
+  0%   { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+@keyframes capyDrop {
+  0%   { transform: translateY(-130vh) rotate(-8deg) scale(1, 1); }
+  55%  { transform: translateY(8px)    rotate(2deg)  scale(1.02, 0.95); }
+  72%  { transform: translateY(-12px)  rotate(-1deg) scale(0.98, 1.04); }
+  88%  { transform: translateY(4px)    rotate(0.5deg) scale(1.01, 0.99); }
+  100% { transform: translateY(0)      rotate(0deg)  scale(1, 1); }
+}
+
+@keyframes capyBreathe {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-2px) scale(1.012, 0.992); }
+}
+
+@keyframes streakIn {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes streakOut {
+  to { opacity: 0; }
+}
+
+@keyframes streakFall {
+  0%   { transform: translateY(-100px); opacity: 0; }
+  20%  { opacity: 0.8; }
+  100% { transform: translateY(60vh); opacity: 0; }
+}
+
+@keyframes textIn {
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes floatZ {
   0%   { transform: translate(0, 0); opacity: 0; }
   20%  { opacity: 1; }
   100% { transform: translate(40px, -60px); opacity: 0; }
+}
+
+/* ===== Keyframes — Shake (dismiss feedback) ===== */
+@keyframes capyShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20%      { transform: translateX(-12px) rotate(-3deg); }
+  40%      { transform: translateX(12px)  rotate(3deg); }
+  60%      { transform: translateX(-7px)  rotate(-1.5deg); }
+  80%      { transform: translateX(7px)   rotate(1.5deg); }
+}
+
+/* ===== Keyframes — Exit (dismissed: hop + leap) ===== */
+@keyframes capyHop {
+  0%   { transform: translateY(0) rotate(0) scale(1, 1); }
+  40%  { transform: translateY(-22px) rotate(-2deg) scale(1.04, 0.94); }
+  100% { transform: translateY(0) rotate(0) scale(1, 1); }
+}
+
+@keyframes capyLeap {
+  0%   { transform: translate(0, 0)      rotate(0deg)   scale(1, 1); opacity: 1; }
+  20%  { transform: translate(60px, -60px) rotate(15deg) scale(0.95, 1.02); }
+  100% { transform: translate(140vw, -140vh) rotate(540deg) scale(0.4, 0.4); opacity: 0; }
+}
+
+@keyframes dustPuff {
+  0%   { opacity: 0; transform: scale(0.5, 0.5); }
+  30%  { opacity: 1; transform: scale(1.1, 1.1); }
+  100% { opacity: 0; transform: scale(1.6, 1.4); }
+}
+
+@keyframes backdropFlash {
+  0%   { opacity: 1; filter: brightness(1); }
+  20%  { opacity: 1; filter: brightness(1.35); }
+  100% { opacity: 0; filter: brightness(1); }
+}
+
+/* ===== Keyframes — Exit (snooze: curl + slide down) ===== */
+@keyframes capyCurl {
+  0%   { transform: translateY(0) rotate(0) scale(1, 1); opacity: 1; }
+  35%  { transform: translateY(0) rotate(0) scale(0.85, 0.85); }
+  100% { transform: translateY(70vh) rotate(-12deg) scale(0.55, 0.55); opacity: 0; }
+}
+
+@keyframes backdropSoft {
+  to { opacity: 0; }
+}
+
+/* ===== Keyframes — text/zzz exit ===== */
+@keyframes textOut {
+  to { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes zzzBurst {
+  0%   { opacity: 1; transform: translateX(-20%) scale(1); }
+  100% { opacity: 0; transform: translateX(-20%) scale(1.6); }
+}
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  #backdrop,
+  #capy,
+  #tagline,
+  #dismiss,
+  #snooze,
+  .streak,
+  #speedlines,
+  .z {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  #stage.exit-leap,
+  #stage.exit-curl,
+  #backdrop.exit-flash,
+  #backdrop.exit-soft {
+    opacity: 0 !important;
+    transition: opacity 200ms ease !important;
+  }
 }
