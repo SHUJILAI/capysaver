@@ -10,10 +10,7 @@ files:
   - package.json
   - "!**/*.md"
   - "!**/.git/**"
-asar: true
-asarUnpack:
-  - assets/clips/**
-  - assets/sprites/**
+asar: false
 
 afterPack: ./build/after-pack.js
 

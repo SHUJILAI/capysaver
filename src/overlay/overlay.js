@@ -9,13 +9,30 @@ const dust = document.getElementById('dust');
 
 let exiting = false;
 
-// Three independent seamless-loop animated WebPs, each with full alpha.
-// Picked at random every time the overlay opens.
 const LOOPS = ['loop_sleep.webp', 'loop_alert.webp', 'loop_blink.webp'];
 
+function diag(msg) {
+  try { window.capy.diag(msg); } catch (_e) {}
+  try { console.log('[capy]', msg); } catch (_e) {}
+}
+
+capy.addEventListener('load', () => diag('img load ok size=' + capy.naturalWidth + 'x' + capy.naturalHeight));
+capy.addEventListener('error', (e) => diag('img error src.length=' + (capy.src ? capy.src.length : 0)));
+
 async function init() {
-  const pick = LOOPS[Math.floor(Math.random() * LOOPS.length)];
-  capy.src = await window.capy.clipUrl(pick);
+  try {
+    const pick = LOOPS[Math.floor(Math.random() * LOOPS.length)];
+    diag('init pick=' + pick);
+    const url = await window.capy.clipUrl(pick);
+    diag('init got url type=' + (url ? url.slice(0, 32) : 'null') + ' len=' + (url ? url.length : 0));
+    if (url) {
+      capy.src = url;
+    } else {
+      diag('init clip url was null — main process could not read file');
+    }
+  } catch (e) {
+    diag('init throw: ' + (e && e.message));
+  }
 }
 init();
 
@@ -44,21 +61,35 @@ function playExitCurl(done) {
   setTimeout(done, 740);
 }
 
-// Single click — immediate dismiss, no countdown, no shrinking, no gating.
 dismiss.addEventListener('click', () => {
   if (exiting) return;
+  diag('dismiss click');
   playExitLeap(() => window.capy.overlayDismissed());
 });
 
 snoozeBtn.addEventListener('click', () => {
   if (exiting) return;
+  diag('snooze click');
   playExitCurl(() => window.capy.overlaySnooze());
 });
 
-// Escape also dismisses now (the capybara has been polite long enough).
 document.addEventListener('keydown', (e) => {
-  if (exiting) return;
   if (e.key === 'Escape') {
-    playExitLeap(() => window.capy.overlayDismissed());
+    diag('escape keydown in renderer');
+    if (!exiting) playExitLeap(() => window.capy.overlayDismissed());
+  }
+});
+
+// Renderer-side belt-and-suspenders: triple-click anywhere on the page also
+// hard-closes via main, in case the dismiss button is somehow unrendered.
+let triple = 0;
+let tripleTimer = null;
+document.addEventListener('click', () => {
+  triple += 1;
+  clearTimeout(tripleTimer);
+  tripleTimer = setTimeout(() => { triple = 0; }, 800);
+  if (triple >= 3) {
+    diag('triple-click panic close');
+    window.capy.overlayForceClose();
   }
 });

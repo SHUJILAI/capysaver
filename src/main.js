@@ -51,14 +51,23 @@ let scheduleTimer = null;
 let snoozeUntil = 0;
 
 function assetPath(...parts) {
-  let p = path.join(__dirname, '..', 'assets', ...parts);
-  // In a packaged build, binary assets listed in `asarUnpack` live in
-  // `app.asar.unpacked/...` — but path.join still produces an `app.asar/...`
-  // string. Rewrite it so file:// URLs hit the real on-disk file.
-  if (p.includes(path.sep + 'app.asar' + path.sep)) {
-    p = p.replace(path.sep + 'app.asar' + path.sep, path.sep + 'app.asar.unpacked' + path.sep);
+  // asar is disabled in electron-builder.yml so paths just resolve directly.
+  return path.join(__dirname, '..', 'assets', ...parts);
+}
+
+// Diagnostic log file, readable from outside the app to debug user reports.
+const LOG_FILE = (() => {
+  try {
+    return path.join(app.getPath('userData'), 'capysaver.log');
+  } catch (_e) {
+    return null;
   }
-  return p;
+})();
+function diag(msg) {
+  try {
+    if (!LOG_FILE) return;
+    require('fs').appendFileSync(LOG_FILE, new Date().toISOString() + ' ' + msg + '\n');
+  } catch (_e) { /* ignore */ }
 }
 
 function ensureNapsDate() {
@@ -185,12 +194,33 @@ function openOverlay() {
   overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   overlayWindow.loadFile(path.join(__dirname, 'overlay', 'overlay.html'));
 
+  // Main-process keyboard escape hatch — works even if the renderer's JS
+  // never executed. Esc / Cmd+W / Cmd+Q all close the overlay window.
+  overlayWindow.webContents.on('before-input-event', (e, input) => {
+    if (input.type !== 'keyDown') return;
+    const k = (input.key || '').toLowerCase();
+    const isEscape = k === 'escape' || k === 'esc';
+    const isCmdW = (input.meta || input.control) && k === 'w';
+    const isCmdQ = (input.meta || input.control) && k === 'q';
+    if (isEscape || isCmdW || isCmdQ) {
+      diag(`escape-hatch fired key=${k} meta=${!!input.meta} ctrl=${!!input.control}`);
+      e.preventDefault();
+      if (overlayWindow && !overlayWindow.isDestroyed()) overlayWindow.close();
+    }
+  });
+
+  overlayWindow.webContents.on('did-fail-load', (_e, errCode, errDesc, url) => {
+    diag(`did-fail-load code=${errCode} desc=${errDesc} url=${url}`);
+  });
+
   overlayWindow.once('ready-to-show', () => {
+    diag('overlay ready-to-show');
     overlayWindow.show();
     overlayWindow.focus();
   });
 
   overlayWindow.on('closed', () => {
+    diag('overlay closed');
     overlayWindow = null;
     rescheduleNextNap();
   });
@@ -273,8 +303,30 @@ ipcMain.handle('capy:asset-url', (_evt, name) => {
   return 'capy://sprite/' + encodeURIComponent(name);
 });
 
+// Return clip as a base64 data URL — bulletproof rendering regardless of
+// any path / protocol / asar weirdness. ~3-5 MB per clip, IPC handles it.
 ipcMain.handle('capy:clip-url', (_evt, name) => {
-  return 'capy://clip/' + encodeURIComponent(name);
+  const fs = require('fs');
+  try {
+    const fullPath = assetPath('clips', name);
+    const buf = fs.readFileSync(fullPath);
+    diag(`clip-url ok name=${name} bytes=${buf.length} path=${fullPath}`);
+    return 'data:image/webp;base64,' + buf.toString('base64');
+  } catch (e) {
+    diag(`clip-url FAIL name=${name} err=${e && e.message}`);
+    return null;
+  }
+});
+
+// Diagnostic ping from renderer (image load events, errors).
+ipcMain.handle('capy:diag', (_evt, msg) => {
+  diag('renderer: ' + String(msg).slice(0, 500));
+});
+
+// Force-close the overlay — used by the keyboard escape hatch.
+ipcMain.handle('capy:overlay-force-close', () => {
+  diag('overlay-force-close requested');
+  if (overlayWindow && !overlayWindow.isDestroyed()) overlayWindow.close();
 });
 
 // ------------- App lifecycle -------------
