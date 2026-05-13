@@ -19,14 +19,30 @@ time.
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0-arm64.dmg) |
-| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0.dmg) |
-| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.0.exe) |
-| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0.AppImage) |
+| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.1-arm64.dmg) |
+| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.1.dmg) |
+| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.1.exe) |
+| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.1.AppImage) |
 
-> **macOS note:** the build is unsigned for now. If macOS says _"CapySaver can't be opened because
-> it is from an unidentified developer"_, right-click the app and choose **Open**, then confirm.
-> You only need to do this the first time.
+> **macOS note:** the build is unsigned for now.
+>
+> - **Intel / older macOS**: if you see _"CapySaver can't be opened because it is from an
+>   unidentified developer"_, right-click the app and choose **Open**, then confirm. You only
+>   need to do this the first time.
+> - **Apple Silicon / recent macOS**: you may instead see _"CapySaver is damaged and can't be
+>   opened. You should move it to the Trash."_ — the app is **not** damaged. Apple Silicon
+>   refuses to launch an unsigned `.app`, so the binary needs both quarantine cleared **and**
+>   an ad-hoc signature. After dragging `CapySaver.app` into `/Applications`, open **Terminal**
+>   and run:
+>
+>   ```bash
+>   sudo xattr -cr /Applications/CapySaver.app
+>   sudo codesign --force --deep --sign - /Applications/CapySaver.app
+>   ```
+>
+>   The first line strips the `com.apple.quarantine` attribute; the second adds an ad-hoc
+>   signature using a system-generated identity (no Apple Developer account needed). After
+>   that, double-click works normally.
 
 ## Install in 30 seconds
 

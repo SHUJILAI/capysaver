@@ -1,6 +1,6 @@
 {
   "name": "capysaver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The screensaver that actually stops you.",
   "main": "src/main.js",
   "author": "happycapy.ai",

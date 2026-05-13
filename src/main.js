@@ -33,7 +33,14 @@ let scheduleTimer = null;
 let snoozeUntil = 0;
 
 function assetPath(...parts) {
-  return path.join(__dirname, '..', 'assets', ...parts);
+  let p = path.join(__dirname, '..', 'assets', ...parts);
+  // In a packaged build, binary assets listed in `asarUnpack` live in
+  // `app.asar.unpacked/...` — but path.join still produces an `app.asar/...`
+  // string. Rewrite it so file:// URLs hit the real on-disk file.
+  if (p.includes(path.sep + 'app.asar' + path.sep)) {
+    p = p.replace(path.sep + 'app.asar' + path.sep, path.sep + 'app.asar.unpacked' + path.sep);
+  }
+  return p;
 }
 
 function ensureNapsDate() {

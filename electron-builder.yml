@@ -11,6 +11,11 @@ files:
   - "!**/*.md"
   - "!**/.git/**"
 asar: true
+asarUnpack:
+  - assets/clips/**
+  - assets/sprites/**
+
+afterPack: ./build/after-pack.js
 
 mac:
   category: public.app-category.lifestyle
