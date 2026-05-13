@@ -1,6 +1,6 @@
 'use strict';
 
-const capy = document.getElementById('capy');
+const capyImg = document.getElementById('capy');
 const dismiss = document.getElementById('dismiss');
 const snoozeBtn = document.getElementById('snooze');
 const stage = document.getElementById('stage');
@@ -16,8 +16,8 @@ function diag(msg) {
   try { console.log('[capy]', msg); } catch (_e) {}
 }
 
-capy.addEventListener('load', () => diag('img load ok size=' + capy.naturalWidth + 'x' + capy.naturalHeight));
-capy.addEventListener('error', (e) => diag('img error src.length=' + (capy.src ? capy.src.length : 0)));
+capyImg.addEventListener('load', () => diag('img load ok size=' + capyImg.naturalWidth + 'x' + capyImg.naturalHeight));
+capyImg.addEventListener('error', (e) => diag('img error src.length=' + (capyImg.src ? capyImg.src.length : 0)));
 
 async function init() {
   try {
@@ -26,7 +26,7 @@ async function init() {
     const url = await window.capy.clipUrl(pick);
     diag('init got url type=' + (url ? url.slice(0, 32) : 'null') + ' len=' + (url ? url.length : 0));
     if (url) {
-      capy.src = url;
+      capyImg.src = url;
     } else {
       diag('init clip url was null — main process could not read file');
     }
@@ -38,10 +38,10 @@ init();
 
 function playExitLeap(done) {
   exiting = true;
-  capy.style.animation = 'none';
-  void capy.offsetWidth;
+  capyImg.style.animation = 'none';
+  void capyImg.offsetWidth;
 
-  capy.classList.add('exit-leap');
+  capyImg.classList.add('exit-leap');
   stage.classList.add('exit-leap');
   backdrop.classList.add('exit-flash');
 
@@ -51,10 +51,10 @@ function playExitLeap(done) {
 
 function playExitCurl(done) {
   exiting = true;
-  capy.style.animation = 'none';
-  void capy.offsetWidth;
+  capyImg.style.animation = 'none';
+  void capyImg.offsetWidth;
 
-  capy.classList.add('exit-curl');
+  capyImg.classList.add('exit-curl');
   stage.classList.add('exit-curl');
   backdrop.classList.add('exit-soft');
 

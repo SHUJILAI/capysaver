@@ -19,10 +19,10 @@ time.
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.4-arm64.dmg) |
-| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.4.dmg) |
-| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.4.exe) |
-| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.4.AppImage) |
+| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5-arm64.dmg) |
+| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5.dmg) |
+| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.5.exe) |
+| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5.AppImage) |
 
 > **macOS note:** the `.app` is **ad-hoc signed in CI** but **not Apple-notarized**, because
 > notarization requires a paid Apple Developer account (US$99/yr). What you'll see depends on
@@ -44,8 +44,8 @@ time.
 > - **macOS Sonoma / Ventura and earlier ("unidentified developer")**: right-click the app
 >   in `/Applications` and choose **Open**, then confirm. First launch only.
 >
-> - **"CapySaver is damaged and can't be opened"** _(rare in 0.1.4+)_: this used to happen on
->   unsigned Apple Silicon builds. The 0.1.4 release ships ad-hoc signed binaries so this
+> - **"CapySaver is damaged and can't be opened"** _(rare in 0.1.5+)_: this used to happen on
+>   unsigned Apple Silicon builds. The 0.1.5 release ships ad-hoc signed binaries so this
 >   should be gone. If it still fires, run:
 >
 >   ```bash
