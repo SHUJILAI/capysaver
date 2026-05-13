@@ -2,10 +2,14 @@
 
 **The screensaver that actually stops you.**
 
-A friendly capybara shows up on your screen at your chosen interval and refuses to leave until you
-agree to rest. It takes three clicks on a shrinking dismiss button to send it away — just long enough
-to make you take an actual breath. It lives quietly in your menu bar / system tray the rest of the
-time.
+Most screensavers are polite. They wait. They defer. They let you keep typing through your
+eighth hour in a row. This one does not.
+
+CapySaver schedules forced breaks using a capybara who lives in your menu bar. When the timer
+fires, the capybara slides onto your screen, sits on your work, and refuses to leave until
+you've actually rested. **30 seconds of mandatory stillness**, then **three clicks** on a
+"let me work :(" button that shrinks and gets sadder each click. By the time it's gone, your
+shoulders have already dropped.
 
 <p align="center">
   <img src="docs/demo.gif" alt="CapySaver demo" width="720" />
@@ -60,44 +64,60 @@ time.
    - macOS: drag `CapySaver.app` into `Applications`.
    - Windows: run the installer.
    - Linux: `chmod +x CapySaver.AppImage && ./CapySaver.AppImage`.
-3. **Look at the menu bar / system tray.** There's a sleeping capybara up there now. Click it to
-   open settings.
+3. **Look at the menu bar / system tray.** There's a sleeping capybara up there now. Click it
+   to open settings.
+
+## How it works
+
+When the interval fires, CapySaver opens a transparent, always-on-top window across your whole
+screen. Three different animated capybara loops are bundled — sleeping, alert, and a
+head-close-up blink — and the overlay picks one at random each time so you don't get bored of
+the same nap.
+
+Then it locks the dismiss button:
+
+- **0 → 30 seconds** — the "let me work :(" button is dashed and faded. Clicking it just
+  shakes the screen. The capybara is asleep on your work and you can't argue with it.
+- **at 30 seconds** — the button unlocks. Now you can click it.
+- **click 1** — the button shrinks. Tagline gets a little sadder.
+- **click 2** — smaller still. Capy looks up.
+- **click 3** — the capybara curls up and slides off-screen.
+
+That's the whole loop. It's not gamified. It's not productivity-tracked. It's just enough
+friction that you take an actual breath.
 
 ## Settings
 
 Open settings from the tray menu → **Settings…**
 
-- **Interval** — how often the capybara wakes up. Default: every 45 minutes. Or set an exact time
-  of day (e.g. `14:00`).
+- **Interval** — how often the capybara wakes up. Default: every 45 minutes. Or set an exact
+  time of day (e.g. `14:00`).
 - **Snooze** — click from the tray menu to skip the next nap by 10 minutes.
 - **Launch at login** — CapySaver starts quietly when you log in, no dock icon on macOS.
 - **Naps today** — the tray tooltip tracks how many times the capybara has visited you today.
 
-## What is this
+## Why bother
 
-Most screensavers are polite. They wait. They defer. They let you keep typing through your eighth
-hour in a row. This one does not.
+RSI, eye strain, and burnout all respond extremely well to *"stop for 30 seconds every
+hour."* The advice is boring. The capybara is not. CapySaver is the boring advice, repackaged
+as a pet you can't ignore.
 
-CapySaver is a small Electron app that schedules forced breaks using a capybara mascot. When the
-timer fires, a transparent always-on-top window slides a sleeping capybara onto your screen with
-a dimmed backdrop and some lazy little `z z z`s. To dismiss it, you have to click a "let me work :("
-button that gets smaller and sadder each time you click it. Three clicks to escape. That's usually
-enough to notice that you should, in fact, take a break.
-
-Break enforcement is the whole point. RSI, eye strain, and burnout all respond extremely well to
-"stop for 30 seconds every hour." CapySaver is a cute version of that advice, packaged as a pet.
+It's free, open source (MIT), and runs on macOS, Windows, and Linux. It does not phone home,
+collect telemetry, or know anything about you. It just sits in your tray and waits.
 
 ## Contributing
 
-Pull requests welcome — especially if you want to replace the capybara with a different animal.
+Pull requests welcome — especially if you want to replace the capybara with a different
+animal.
 
-- `assets/sprites/` — swap in your own PNGs (1024×1024 transparent for the two overlay poses, any
-  square PNG for the icon).
-- `src/overlay/overlay.css` — tweak the animation, palette, tagline.
-- `src/main.js` — scheduling logic and tray menu.
+- `assets/clips/` — three animated WebPs picked at random per overlay (sleeping / alert /
+  blink). Drop in replacements at the same dimensions.
+- `assets/sprites/` — tray icon + the small "thinking" pose used by the settings window.
+- `src/overlay/overlay.css` — animation, palette, tagline, button shrink curve.
+- `src/main.js` — scheduling logic, tray menu, IPC bridge to the overlay.
 
 To record the demo GIF: clone the repo on your machine, run `npm run dev`, set the trigger to
-`every 1 minute`, screen-record the overlay slide-down, and drop the GIF at `docs/demo.gif`.
+`every 1 minute`, screen-record the overlay, and drop the GIF at `docs/demo.gif`.
 
 ```bash
 git clone https://github.com/SHUJILAI/capysaver.git
