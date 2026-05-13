@@ -8,4 +8,5 @@ contextBridge.exposeInMainWorld('capy', {
   overlayDismissed: () => ipcRenderer.invoke('capy:overlay-dismissed'),
   overlaySnooze: () => ipcRenderer.invoke('capy:overlay-snooze'),
   assetUrl: (name) => ipcRenderer.invoke('capy:asset-url', name),
+  clipUrl: (name) => ipcRenderer.invoke('capy:clip-url', name),
 });

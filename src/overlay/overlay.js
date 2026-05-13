@@ -1,6 +1,9 @@
 'use strict';
 
-const capyImg = document.getElementById('capy');
+const capy = document.getElementById('capy');
+const vEnter = document.getElementById('capy-enter');
+const vLoop  = document.getElementById('capy-loop');
+const vExit  = document.getElementById('capy-exit');
 const dismiss = document.getElementById('dismiss');
 const snoozeBtn = document.getElementById('snooze');
 const stage = document.getElementById('stage');
@@ -9,56 +12,74 @@ const dust = document.getElementById('dust');
 
 let clickCount = 0;
 let exiting = false;
-let sleepUrl = '';
-let shakeUrl = '';
+let phase = 'idle'; // 'enter' | 'loop' | 'exit'
+
+function showClip(active) {
+  for (const v of [vEnter, vLoop, vExit]) {
+    v.classList.toggle('active', v === active);
+  }
+}
 
 async function init() {
-  sleepUrl = await window.capy.assetUrl('capy_sleep.png');
-  shakeUrl = await window.capy.assetUrl('capy_shake.png');
-  capyImg.src = sleepUrl;
+  const [enterUrl, loopUrl, exitUrl] = await Promise.all([
+    window.capy.clipUrl('capy_enter.mp4'),
+    window.capy.clipUrl('capy_sleep_loop.mp4'),
+    window.capy.clipUrl('capy_exit.mp4'),
+  ]);
+  vEnter.src = enterUrl;
+  vLoop.src  = loopUrl;
+  vExit.src  = exitUrl;
+
+  // entrance plays once, then crossfade to seamless loop
+  vEnter.addEventListener('ended', () => {
+    if (exiting) return;
+    phase = 'loop';
+    vLoop.currentTime = 0;
+    vLoop.play().catch(() => {});
+    showClip(vLoop);
+  });
+
+  // exit clip ends -> notify main to close + count nap
+  vExit.addEventListener('ended', () => {
+    window.capy.overlayDismissed();
+  });
+
+  // start the show
+  phase = 'enter';
+  showClip(vEnter);
+  // small delay so the capyDrop transform finishes before motion starts
+  setTimeout(() => { vEnter.play().catch(() => {}); }, 950);
 }
 init();
 
 function flashShake() {
-  if (!shakeUrl || exiting) return;
-  capyImg.src = shakeUrl;
-  capyImg.classList.remove('shake');
+  if (exiting) return;
+  capy.classList.remove('shake');
   // reflow to restart animation
-  void capyImg.offsetWidth;
-  capyImg.classList.add('shake');
+  void capy.offsetWidth;
+  capy.classList.add('shake');
   setTimeout(() => {
     if (exiting) return;
-    capyImg.src = sleepUrl;
-    capyImg.classList.remove('shake');
+    capy.classList.remove('shake');
   }, 800);
 }
 
-function playExitLeap(done) {
+function startExitClip() {
   exiting = true;
-  // freeze breathing/shake before exit choreography
-  capyImg.classList.remove('shake');
-  capyImg.style.animation = 'none';
-  void capyImg.offsetWidth;
-
-  // hop -> leap is one combined animation defined in CSS via .exit-leap
-  capyImg.classList.add('exit-leap');
-  stage.classList.add('exit-leap');
-  backdrop.classList.add('exit-flash');
-
-  // dust puff timed to land at the moment of leap takeoff (~240ms in)
-  setTimeout(() => dust.classList.add('go'), 220);
-
-  // Total exit length ~960ms (240 hop + 720 leap). Add small buffer.
-  setTimeout(done, 1020);
+  phase = 'exit';
+  vLoop.pause();
+  vExit.currentTime = 0;
+  showClip(vExit);
+  vExit.play().catch(() => {});
 }
 
 function playExitCurl(done) {
   exiting = true;
-  capyImg.classList.remove('shake');
-  capyImg.style.animation = 'none';
-  void capyImg.offsetWidth;
+  capy.classList.remove('shake');
 
-  capyImg.classList.add('exit-curl');
+  // curl-snooze uses CSS animation since the wake-and-walk-out clip
+  // is reserved for the "I really need to work" dismissal.
+  capy.classList.add('exit-curl');
   stage.classList.add('exit-curl');
   backdrop.classList.add('exit-soft');
 
@@ -80,8 +101,9 @@ dismiss.addEventListener('click', () => {
     dismiss.classList.add('size-10');
     return;
   }
-  // 3rd click: play exit, THEN tell main to close + count nap
-  playExitLeap(() => window.capy.overlayDismissed());
+  // 3rd click: capybara wakes up and walks off-screen to the right,
+  // then main process closes the window and counts the nap.
+  startExitClip();
 });
 
 snoozeBtn.addEventListener('click', () => {

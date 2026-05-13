@@ -248,6 +248,10 @@ ipcMain.handle('capy:asset-url', (_evt, name) => {
   return 'file://' + assetPath('sprites', name);
 });
 
+ipcMain.handle('capy:clip-url', (_evt, name) => {
+  return 'file://' + assetPath('clips', name);
+});
+
 // ------------- App lifecycle -------------
 
 function initTray() {
