@@ -6,10 +6,10 @@ Most screensavers are polite. They wait. They defer. They let you keep typing th
 eighth hour in a row. This one does not.
 
 CapySaver schedules forced breaks using a capybara who lives in your menu bar. When the timer
-fires, the capybara slides onto your screen, sits on your work, and refuses to leave until
-you've actually rested. **30 seconds of mandatory stillness**, then **three clicks** on a
-"let me work :(" button that shrinks and gets sadder each click. By the time it's gone, your
-shoulders have already dropped.
+fires, the capybara slides onto your screen, sits on your work, and locks the dismiss button
+for **30 seconds of mandatory stillness** with a live countdown. Only after the timer runs
+out does the "let me work :(" button unlock — one click and the capybara curls up and slides
+away. By the time it's gone, your shoulders have already dropped.
 
 <p align="center">
   <img src="docs/demo.gif" alt="CapySaver demo" width="720" />
@@ -23,10 +23,10 @@ shoulders have already dropped.
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5-arm64.dmg) |
-| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5.dmg) |
-| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.5.exe) |
-| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.5.AppImage) |
+| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.6-arm64.dmg) |
+| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.6.dmg) |
+| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.6.exe) |
+| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.6.AppImage) |
 
 > **macOS note:** the `.app` is **ad-hoc signed in CI** but **not Apple-notarized**, because
 > notarization requires a paid Apple Developer account (US$99/yr). What you'll see depends on
@@ -48,8 +48,8 @@ shoulders have already dropped.
 > - **macOS Sonoma / Ventura and earlier ("unidentified developer")**: right-click the app
 >   in `/Applications` and choose **Open**, then confirm. First launch only.
 >
-> - **"CapySaver is damaged and can't be opened"** _(rare in 0.1.5+)_: this used to happen on
->   unsigned Apple Silicon builds. The 0.1.5 release ships ad-hoc signed binaries so this
+> - **"CapySaver is damaged and can't be opened"** _(rare in 0.1.6+)_: this used to happen on
+>   unsigned Apple Silicon builds. The 0.1.6 release ships ad-hoc signed binaries so this
 >   should be gone. If it still fires, run:
 >
 >   ```bash
@@ -74,17 +74,19 @@ screen. Three different animated capybara loops are bundled — sleeping, alert,
 head-close-up blink — and the overlay picks one at random each time so you don't get bored of
 the same nap.
 
-Then it locks the dismiss button:
+Then it locks the dismiss button for 30 seconds:
 
-- **0 → 30 seconds** — the "let me work :(" button is dashed and faded. Clicking it just
-  shakes the screen. The capybara is asleep on your work and you can't argue with it.
-- **at 30 seconds** — the button unlocks. Now you can click it.
-- **click 1** — the button shrinks. Tagline gets a little sadder.
-- **click 2** — smaller still. Capy looks up.
-- **click 3** — the capybara curls up and slides off-screen.
+- **0 → 30 seconds** — the "let me work :(" button is dashed and faded, with a live countdown
+  underneath: *"rest 27s before you can leave"*. Clicking it just shakes the screen.
+  The capybara is asleep on your work and you can't argue with it.
+- **at 30 seconds** — the countdown ends, the button solidifies, and the line under it flips
+  to *"rest done. go ahead"*.
+- **one click** — the capybara curls up and slides off-screen, the window fades, you're back
+  to your work.
 
-That's the whole loop. It's not gamified. It's not productivity-tracked. It's just enough
-friction that you take an actual breath.
+That's the whole loop. It's not gamified. It's not productivity-tracked. The 30 seconds is
+the entire point — long enough that you'll actually look away from the screen, short enough
+that you don't resent it.
 
 ## Settings
 

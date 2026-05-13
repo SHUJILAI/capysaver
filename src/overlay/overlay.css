@@ -179,10 +179,16 @@ html, body {
 }
 
 #dismiss.size-20 { font-size: 20px; }
-#dismiss.size-14 { font-size: 14px; padding: 6px 12px; opacity: 0.7; }
-#dismiss.size-10 { font-size: 10px; padding: 4px 10px; opacity: 0.45; border-style: dashed; }
 
-#dismiss:hover { color: var(--gold); border-color: var(--gold); }
+#dismiss.locked {
+  pointer-events: none;
+  opacity: 0.35 !important;
+  border-color: rgba(250, 246, 238, 0.2);
+  border-style: dashed;
+  color: rgba(250, 246, 238, 0.7);
+}
+
+#dismiss:not(.locked):hover { color: var(--gold); border-color: var(--gold); }
 
 #snooze {
   margin-top: 6px;

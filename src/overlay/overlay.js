@@ -6,8 +6,47 @@ const snoozeBtn = document.getElementById('snooze');
 const stage = document.getElementById('stage');
 const backdrop = document.getElementById('backdrop');
 const dust = document.getElementById('dust');
+const countdown = document.getElementById('countdown');
+const countdownNum = document.getElementById('countdown-num');
 
 let exiting = false;
+const REST_SECONDS = 30;
+let restRemaining = REST_SECONDS;
+let countdownTimer = null;
+
+function renderCountdown() {
+  if (restRemaining > 0) {
+    if (countdownNum) countdownNum.textContent = String(restRemaining);
+  } else {
+    if (countdown) countdown.innerHTML = 'rest done. <span class="num">go ahead</span>';
+    if (dismiss) dismiss.classList.remove('locked');
+  }
+}
+
+function startCountdown() {
+  renderCountdown();
+  countdownTimer = setInterval(() => {
+    if (exiting) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+      return;
+    }
+    restRemaining -= 1;
+    renderCountdown();
+    if (restRemaining <= 0) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+  }, 1000);
+}
+
+function flashShake() {
+  if (!capyImg) return;
+  capyImg.classList.remove('shake');
+  void capyImg.offsetWidth;
+  capyImg.classList.add('shake');
+  setTimeout(() => capyImg.classList.remove('shake'), 700);
+}
 
 const LOOPS = ['loop_sleep.webp', 'loop_alert.webp', 'loop_blink.webp'];
 
@@ -33,6 +72,7 @@ async function init() {
   } catch (e) {
     diag('init throw: ' + (e && e.message));
   }
+  startCountdown();
 }
 init();
 
@@ -63,20 +103,35 @@ function playExitCurl(done) {
 
 dismiss.addEventListener('click', () => {
   if (exiting) return;
+  if (restRemaining > 0) {
+    diag('dismiss click while locked, remaining=' + restRemaining);
+    flashShake();
+    return;
+  }
   diag('dismiss click');
   playExitLeap(() => window.capy.overlayDismissed());
 });
 
 snoozeBtn.addEventListener('click', () => {
   if (exiting) return;
+  if (restRemaining > 0) {
+    diag('snooze click while locked, remaining=' + restRemaining);
+    flashShake();
+    return;
+  }
   diag('snooze click');
   playExitCurl(() => window.capy.overlaySnooze());
 });
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    diag('escape keydown in renderer');
-    if (!exiting) playExitLeap(() => window.capy.overlayDismissed());
+    diag('escape keydown in renderer remaining=' + restRemaining);
+    if (exiting) return;
+    if (restRemaining > 0) {
+      flashShake();
+      return;
+    }
+    playExitLeap(() => window.capy.overlayDismissed());
   }
 });
 
