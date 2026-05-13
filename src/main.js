@@ -187,12 +187,49 @@ function openOverlay() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
     },
   });
 
   overlayWindow.setAlwaysOnTop(true, 'screen-saver');
   overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   overlayWindow.loadFile(path.join(__dirname, 'overlay', 'overlay.html'));
+
+  // -------- Aggressive renderer-side diagnostics --------
+  overlayWindow.webContents.on('console-message', (_e, level, message, line, sourceId) => {
+    diag(`renderer-console L${level} ${sourceId}:${line} | ${message}`);
+  });
+  overlayWindow.webContents.on('preload-error', (_e, preloadPath, err) => {
+    diag(`PRELOAD-ERROR ${preloadPath}: ${err && err.stack || err}`);
+  });
+  overlayWindow.webContents.on('did-finish-load', () => diag('did-finish-load'));
+  overlayWindow.webContents.on('dom-ready', () => diag('dom-ready'));
+  overlayWindow.webContents.on('render-process-gone', (_e, details) => {
+    diag(`render-process-gone: ${JSON.stringify(details)}`);
+  });
+
+  // After load, evaluate a tiny script in the renderer to confirm that
+  // arbitrary JS execution actually works there. If we never see this
+  // entry in the log, the renderer is dead-on-arrival.
+  overlayWindow.webContents.once('did-finish-load', () => {
+    overlayWindow.webContents.executeJavaScript(`
+      (function(){
+        try {
+          var info = {
+            ua: navigator.userAgent.slice(0,80),
+            hasWindowCapy: typeof window.capy,
+            hasImg: !!document.getElementById('capy'),
+            hasDismiss: !!document.getElementById('dismiss'),
+            scripts: document.scripts.length,
+          };
+          if (window.capy && window.capy.diag) window.capy.diag('eval-probe ' + JSON.stringify(info));
+          return JSON.stringify(info);
+        } catch (e) { return 'eval-err: ' + (e && e.message); }
+      })();
+    `).then((res) => diag('eval-probe-return ' + String(res).slice(0,300))).catch((err) => diag('eval-probe-throw ' + (err && err.message)));
+  });
 
   // Main-process keyboard escape hatch — works even if the renderer's JS
   // never executed. Esc / Cmd+W / Cmd+Q all close the overlay window.
