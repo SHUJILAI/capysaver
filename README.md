@@ -19,10 +19,10 @@ time.
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest) |
-| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest) |
-| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest) |
-| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest) |
+| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0-arm64.dmg) |
+| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0.dmg) |
+| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.0.exe) |
+| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.0.AppImage) |
 
 > **macOS note:** the build is unsigned for now. If macOS says _"CapySaver can't be opened because
 > it is from an unidentified developer"_, right-click the app and choose **Open**, then confirm.
