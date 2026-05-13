@@ -1,8 +1,6 @@
 'use strict';
 
-const capyVideo = document.getElementById('capy');
-const capyFallback = document.getElementById('capy-fallback');
-const capyWrap = document.getElementById('capy-wrap');
+const capyImg = document.getElementById('capy');
 const dismiss = document.getElementById('dismiss');
 const snoozeBtn = document.getElementById('snooze');
 const stage = document.getElementById('stage');
@@ -11,63 +9,56 @@ const dust = document.getElementById('dust');
 
 let clickCount = 0;
 let exiting = false;
+let sleepUrl = '';
+let shakeUrl = '';
 
 async function init() {
-  // Video: looping breathing clip (dark forest-green background designed to
-  // blend with the overlay backdrop via the radial mask in CSS).
-  const videoUrl = await window.capy.assetUrl('capy_sleep.mp4');
-  // Fallback static photo if the platform can't decode the video.
-  const fallbackUrl = await window.capy.assetUrl('capy_sleep.png');
-  capyFallback.src = fallbackUrl;
-
-  capyVideo.src = videoUrl;
-  capyVideo.addEventListener('error', () => capyWrap.classList.add('video-failed'));
-  // ensure autoplay actually starts (some platforms require explicit play())
-  const playAttempt = capyVideo.play();
-  if (playAttempt && typeof playAttempt.catch === 'function') {
-    playAttempt.catch(() => {
-      // muted+playsinline should always allow autoplay; if it doesn't, fall back to PNG
-      capyWrap.classList.add('video-failed');
-    });
-  }
+  sleepUrl = await window.capy.assetUrl('capy_sleep.png');
+  shakeUrl = await window.capy.assetUrl('capy_shake.png');
+  capyImg.src = sleepUrl;
 }
 init();
 
 function flashShake() {
-  if (exiting) return;
-  capyWrap.classList.remove('shake');
-  void capyWrap.offsetWidth; // reflow to restart
-  capyWrap.classList.add('shake');
+  if (!shakeUrl || exiting) return;
+  capyImg.src = shakeUrl;
+  capyImg.classList.remove('shake');
+  // reflow to restart animation
+  void capyImg.offsetWidth;
+  capyImg.classList.add('shake');
   setTimeout(() => {
     if (exiting) return;
-    capyWrap.classList.remove('shake');
+    capyImg.src = sleepUrl;
+    capyImg.classList.remove('shake');
   }, 800);
 }
 
 function playExitLeap(done) {
   exiting = true;
-  capyWrap.classList.remove('shake');
-  capyWrap.style.animation = 'none';
-  void capyWrap.offsetWidth;
+  // freeze breathing/shake before exit choreography
+  capyImg.classList.remove('shake');
+  capyImg.style.animation = 'none';
+  void capyImg.offsetWidth;
 
-  capyWrap.classList.add('exit-leap');
+  // hop -> leap is one combined animation defined in CSS via .exit-leap
+  capyImg.classList.add('exit-leap');
   stage.classList.add('exit-leap');
   backdrop.classList.add('exit-flash');
 
-  // dust puff timed to land at the moment of leap takeoff (~hop end)
+  // dust puff timed to land at the moment of leap takeoff (~240ms in)
   setTimeout(() => dust.classList.add('go'), 220);
 
-  // 240 hop + 720 leap + small buffer
+  // Total exit length ~960ms (240 hop + 720 leap). Add small buffer.
   setTimeout(done, 1020);
 }
 
 function playExitCurl(done) {
   exiting = true;
-  capyWrap.classList.remove('shake');
-  capyWrap.style.animation = 'none';
-  void capyWrap.offsetWidth;
+  capyImg.classList.remove('shake');
+  capyImg.style.animation = 'none';
+  void capyImg.offsetWidth;
 
-  capyWrap.classList.add('exit-curl');
+  capyImg.classList.add('exit-curl');
   stage.classList.add('exit-curl');
   backdrop.classList.add('exit-soft');
 
