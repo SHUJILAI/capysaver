@@ -15,7 +15,7 @@ html, body {
   background: transparent;
   user-select: none;
   -webkit-user-select: none;
-  cursor: url('../../assets/sprites/paw_cursor.png') 8 8, default;
+  cursor: url('capy://sprite/paw_cursor.png') 8 8, default;
 }
 
 /* ===== Backdrop ===== */
@@ -170,7 +170,7 @@ html, body {
   border: 1px solid rgba(250, 246, 238, 0.35);
   border-radius: 999px;
   padding: 8px 16px;
-  cursor: url('../../assets/sprites/paw_cursor.png') 8 8, pointer;
+  cursor: url('capy://sprite/paw_cursor.png') 8 8, pointer;
   opacity: 0;
   transform: translateY(12px);
   transition: font-size 220ms ease, padding 220ms ease, color 220ms ease, border-color 220ms ease;
@@ -182,13 +182,6 @@ html, body {
 #dismiss.size-14 { font-size: 14px; padding: 6px 12px; opacity: 0.7; }
 #dismiss.size-10 { font-size: 10px; padding: 4px 10px; opacity: 0.45; border-style: dashed; }
 
-#dismiss.locked {
-  pointer-events: none;
-  opacity: 0.35 !important;
-  border-color: rgba(250, 246, 238, 0.2);
-  border-style: dashed;
-}
-
 #dismiss:hover { color: var(--gold); border-color: var(--gold); }
 
 #snooze {
@@ -199,7 +192,7 @@ html, body {
   font-size: 12px;
   letter-spacing: 0.5px;
   text-decoration: underline;
-  cursor: url('../../assets/sprites/paw_cursor.png') 8 8, pointer;
+  cursor: url('capy://sprite/paw_cursor.png') 8 8, pointer;
   opacity: 0;
   transform: translateY(12px);
   animation: textIn 500ms 1550ms ease-out forwards;

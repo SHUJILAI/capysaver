@@ -1,7 +1,8 @@
 'use strict';
 
-const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen, shell } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen, shell, protocol, net } = require('electron');
 const path = require('path');
+const url = require('url');
 const Store = require('electron-store');
 const AutoLaunch = require('auto-launch');
 
@@ -11,6 +12,23 @@ if (!gotSingleInstance) {
   app.quit();
   process.exit(0);
 }
+
+// Register a privileged `capy://` scheme BEFORE app.whenReady().
+// Renderer can then use `capy://clip/loop_sleep.webp` and
+// `capy://sprite/paw_cursor.png` regardless of whether assets live
+// loose on disk (dev) or inside `app.asar.unpacked` (packed build).
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'capy',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true,
+      bypassCSP: true,
+    },
+  },
+]);
 
 const store = new Store({
   defaults: {
@@ -252,11 +270,11 @@ ipcMain.handle('capy:overlay-snooze', () => {
 });
 
 ipcMain.handle('capy:asset-url', (_evt, name) => {
-  return 'file://' + assetPath('sprites', name);
+  return 'capy://sprite/' + encodeURIComponent(name);
 });
 
 ipcMain.handle('capy:clip-url', (_evt, name) => {
-  return 'file://' + assetPath('clips', name);
+  return 'capy://clip/' + encodeURIComponent(name);
 });
 
 // ------------- App lifecycle -------------
@@ -272,6 +290,25 @@ function initTray() {
 }
 
 app.whenReady().then(() => {
+  // Wire up the capy:// scheme to actual filesystem reads.
+  // capy://clip/<file>   → assets/clips/<file>
+  // capy://sprite/<file> → assets/sprites/<file>
+  protocol.handle('capy', (req) => {
+    try {
+      const u = new URL(req.url);
+      const category = u.host;          // 'clip' or 'sprite'
+      const fileName = decodeURIComponent(u.pathname.replace(/^\//, ''));
+      let dir;
+      if (category === 'clip') dir = 'clips';
+      else if (category === 'sprite') dir = 'sprites';
+      else return new Response('not found', { status: 404 });
+      const fullPath = assetPath(dir, fileName);
+      return net.fetch(url.pathToFileURL(fullPath).toString());
+    } catch (err) {
+      return new Response('error: ' + (err && err.message), { status: 500 });
+    }
+  });
+
   if (process.platform === 'darwin' && app.dock) {
     app.dock.hide(); // menu-bar app
   }
