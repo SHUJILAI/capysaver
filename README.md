@@ -24,25 +24,34 @@ time.
 | Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-Setup-0.1.1.exe) |
 | Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest/download/CapySaver-0.1.1.AppImage) |
 
-> **macOS note:** the build is unsigned for now.
+> **macOS note:** the `.app` is **ad-hoc signed in CI** but **not Apple-notarized**, because
+> notarization requires a paid Apple Developer account (US$99/yr). What you'll see depends on
+> your macOS version:
 >
-> - **Intel / older macOS**: if you see _"CapySaver can't be opened because it is from an
->   unidentified developer"_, right-click the app and choose **Open**, then confirm. You only
->   need to do this the first time.
-> - **Apple Silicon / recent macOS**: you may instead see _"CapySaver is damaged and can't be
->   opened. You should move it to the Trash."_ — the app is **not** damaged. Apple Silicon
->   refuses to launch an unsigned `.app`, so the binary needs both quarantine cleared **and**
->   an ad-hoc signature. After dragging `CapySaver.app` into `/Applications`, open **Terminal**
->   and run:
+> - **macOS Sequoia 15+ ("Apple cannot verify… is free of malware")**: Sequoia removed the
+>   right-click → Open bypass for unnotarized apps. Two ways to allow it:
+>
+>   - **Easiest, one Terminal line** — strip the quarantine flag and double-click works:
+>
+>     ```bash
+>     sudo xattr -dr com.apple.quarantine /Applications/CapySaver.app
+>     ```
+>
+>   - **No-Terminal version** — when the warning appears, click **Done**, then open
+>     **System Settings → Privacy & Security**, scroll to the bottom, and click
+>     **Open Anyway** next to the line about CapySaver. Confirm with your password.
+>
+> - **macOS Sonoma / Ventura and earlier ("unidentified developer")**: right-click the app
+>   in `/Applications` and choose **Open**, then confirm. First launch only.
+>
+> - **"CapySaver is damaged and can't be opened"** _(rare in 0.1.1+)_: this used to happen on
+>   unsigned Apple Silicon builds. The 0.1.1 release ships ad-hoc signed binaries so this
+>   should be gone. If it still fires, run:
 >
 >   ```bash
 >   sudo xattr -cr /Applications/CapySaver.app
 >   sudo codesign --force --deep --sign - /Applications/CapySaver.app
 >   ```
->
->   The first line strips the `com.apple.quarantine` attribute; the second adds an ad-hoc
->   signature using a system-generated identity (no Apple Developer account needed). After
->   that, double-click works normally.
 
 ## Install in 30 seconds
 
