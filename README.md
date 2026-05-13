@@ -19,10 +19,10 @@ time.
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/REPLACE_ME/capysaver/releases/latest) |
-| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/REPLACE_ME/capysaver/releases/latest) |
-| Windows               | [CapySaver-Setup.exe](https://github.com/REPLACE_ME/capysaver/releases/latest) |
-| Linux                 | [CapySaver.AppImage](https://github.com/REPLACE_ME/capysaver/releases/latest) |
+| macOS (Apple Silicon) | [CapySaver-arm64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest) |
+| macOS (Intel)         | [CapySaver-x64.dmg](https://github.com/SHUJILAI/capysaver/releases/latest) |
+| Windows               | [CapySaver-Setup.exe](https://github.com/SHUJILAI/capysaver/releases/latest) |
+| Linux                 | [CapySaver.AppImage](https://github.com/SHUJILAI/capysaver/releases/latest) |
 
 > **macOS note:** the build is unsigned for now. If macOS says _"CapySaver can't be opened because
 > it is from an unidentified developer"_, right-click the app and choose **Open**, then confirm.
@@ -75,7 +75,7 @@ To record the demo GIF: clone the repo on your machine, run `npm run dev`, set t
 `every 1 minute`, screen-record the overlay slide-down, and drop the GIF at `docs/demo.gif`.
 
 ```bash
-git clone https://github.com/REPLACE_ME/capysaver.git
+git clone https://github.com/SHUJILAI/capysaver.git
 cd capysaver
 npm install
 npm run dev

@@ -9,7 +9,7 @@
   "homepage": "https://happycapy.ai/capysaver",
   "repository": {
     "type": "git",
-    "url": "https://github.com/REPLACE_ME/capysaver.git"
+    "url": "https://github.com/SHUJILAI/capysaver.git"
   },
   "scripts": {
     "start": "electron .",
